@@ -3,6 +3,7 @@ package com.calculator.model;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -10,10 +11,11 @@ import java.util.Objects;
 @Getter
 @Setter
 @AllArgsConstructor
+@ToString
 public class Operation implements Comparable<Operation> {
     private String operator;
     private OperationOptions type;
-    private Integer value;
+    private Double value;
     private LocalDateTime operationDate;
     private Account account;
 
