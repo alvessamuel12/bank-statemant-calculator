@@ -3,6 +3,7 @@ package com.calculator;
 import com.calculator.model.Account;
 import com.calculator.model.Operation;
 import com.calculator.model.OperationOptions;
+import com.calculator.model.Statement;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 
@@ -12,9 +13,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedList;
-import java.util.List;
-
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class Main {
@@ -31,14 +31,13 @@ public class Main {
 
         Path path = Paths.get("./src/main/resources/operacoes.csv");
 
-        Reader reader = null;
+        Reader reader;
         List<Operation> operacoes = new LinkedList<>();
         String [] line;
-        CSVReader csvReader = null;
         int count = 0;
         try {
             reader = Files.newBufferedReader(path);
-            csvReader = new CSVReader(reader);
+            CSVReader csvReader = new CSVReader(reader);
             while((line = csvReader.readNext()) != null) {
                 if (count == 0) {
                     count++;
@@ -52,12 +51,30 @@ public class Main {
             e.printStackTrace();
         }
 
-        System.out.println(operacoes.get(0));
 
+//        fornecedor - acumulação - combinação
+//         Map<Object, Set<Operation>> teste = operacoes.stream()
+//                 .collect(Collectors.groupingBy(operation -> operation.getAccount().getAccountNumber(), Collectors.toSet()));
 
-//        Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
+        Map<Account, Set<Operation>> teste = operacoes.stream()
+                .collect(Collectors.toMap(
+                        Operation::getAccount,
+                        operation -> {
+                            Set<Operation> operationSet = new TreeSet<>();
+                            operationSet.add(operation);
+                            return operationSet;
+                        },
+                        (acumulador, atual) -> {
+                            acumulador.addAll(atual);
+                            return acumulador;
+                        }
+                )
+        );
+//        Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)
 
-
+        Account account = (Account) teste.keySet().toArray()[0];
+        Statement statement = createStatement(account, teste.get(account));
+        System.out.println(statement);
 //        reader.;
 
 //        LocalDateTime data = LocalDateTime.parse("2022-01-08T12:18:40", DateTimeFormatter.ISO_DATE_TIME);
@@ -85,5 +102,9 @@ public class Main {
         String numeroDaConta = line[NUMERO_DA_CONTA];
         Account conta = new Account(idDaConta, nomeDoBanco, numeroDaAgencia, numeroDaConta);
         return new Operation(operador, option, valor, date, conta);
+    }
+
+    private static Statement createStatement(Account account, Set<Operation> operations) {
+        return new Statement(account, operations);
     }
 }
