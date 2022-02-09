@@ -23,6 +23,10 @@ public class Statement {
         this.balance = 0;
     }
 
+    public String getAccountID() {
+        return account.getId();
+    }
+
     private void addOperation(Operation operation) {
         builder.append(createOperationLine(operation)).append('\n');
     }

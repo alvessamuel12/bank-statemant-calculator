@@ -33,6 +33,6 @@ public class Account {
     public String toString() {
         return "Banco " + bankName + '\n' +
                 "Agência: ... " + agencyNumber + '\n' +
-                "Conta: .... " + accountNumber + '\n';
+                "Conta: ..... " + accountNumber + '\n';
     }
 }

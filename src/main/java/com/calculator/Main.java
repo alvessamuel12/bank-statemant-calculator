@@ -27,10 +27,11 @@ public class Main {
     private static final int TIPO = 6;
     private static final int VALOR = 7;
 
-    public static void main(String[] args) {
+    public static <dir> void main(String[] args) {
 
+
+        // TODO exportar para classe de import e export de informacoes
         Path path = Paths.get("./src/main/resources/operacoes.csv");
-
         Reader reader;
         List<Operation> operacoes = new LinkedList<>();
         String [] line;
@@ -51,11 +52,7 @@ public class Main {
             e.printStackTrace();
         }
 
-
-//        fornecedor - acumulação - combinação
-//         Map<Object, Set<Operation>> teste = operacoes.stream()
-//                 .collect(Collectors.groupingBy(operation -> operation.getAccount().getAccountNumber(), Collectors.toSet()));
-
+        // TODO exportar para metodo que transforma a lista de infos na estrutura correta
         Map<Account, Set<Operation>> teste = operacoes.stream()
                 .collect(Collectors.toMap(
                         Operation::getAccount,
@@ -70,18 +67,31 @@ public class Main {
                         }
                 )
         );
-//        Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)
 
-        Account account = (Account) teste.keySet().toArray()[0];
-        Statement statement = createStatement(account, teste.get(account));
-        System.out.println(statement);
-//        reader.;
 
-//        LocalDateTime data = LocalDateTime.parse("2022-01-08T12:18:40", DateTimeFormatter.ISO_DATE_TIME);
-
-        /*
-        * map do nome do operador com um set de operacoes
-        * */
+        // TODO exportar para metodos de escrita, criacao e manutencao dos arquivos e diretorios
+        String pathDir = "./statements";
+        Path pathDirectory = Paths.get(pathDir);
+        File dir;
+        try {
+            if(!new File(pathDirectory.toString()).exists()) {
+                Files.createDirectory(pathDirectory);
+            } else {
+                dir = new File(pathDir);
+                Arrays.stream(dir.listFiles()).forEach(File::delete);
+                Files.delete(pathDirectory);
+                Files.createDirectory(pathDirectory);
+            }
+            List<Statement> statements = teste.keySet().stream()
+                    .map(account -> createStatement(account, teste.get(account))).toList();
+            for (Statement statement : statements) {
+                String fileName = statement.getAccountID()+".txt";
+                Path filePath = Files.createFile(Paths.get(pathDirectory +"/"+fileName));
+                Files.writeString(filePath, statement.toString());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         /*
          * carregar as operações para uma estrutura e organizar por conta,
