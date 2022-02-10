@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -34,6 +35,10 @@ public class Operation implements Comparable<Operation> {
 
     @Override
     public int compareTo(Operation o) {
-        return this.getOperationDate().compareTo(o.getOperationDate());
+        return new CompareToBuilder()
+                .append(this.getOperator(), o.getOperator())
+                .append(this.getType(), o.getType())
+                .append(this.getValue(), o.getValue())
+                .append(this.getOperationDate(), o.getOperationDate()).toComparison();
     }
 }

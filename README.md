@@ -1,1 +1,1 @@
-# bank-statemant-calculator
+# Bank Statemant Calculator
